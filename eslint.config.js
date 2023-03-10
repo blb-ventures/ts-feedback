@@ -1,49 +1,33 @@
 const path = require('path');
 const confusingBrowserGlobals = require('confusing-browser-globals');
-const tsconfigPath = path.resolve(__dirname, './configs/tsconfig.esm.json');
-// const reactPlugin = require('eslint-plugin-react');
-// const reactHooksPlugin = require('eslint-plugin-react-hooks');
-const importPlugin = require('eslint-plugin-import');
-const jsxA11yPlugin = require('eslint-plugin-jsx-a11y');
+const tsconfigPath = path.resolve(__dirname, './tsconfig.esm.json');
 const prettierPlugin = require('eslint-plugin-prettier');
 const typescriptPlugin = require('@typescript-eslint/eslint-plugin');
 const typescriptRecommended = require('@typescript-eslint/eslint-plugin/dist/configs/recommended');
 const typescriptRecommendedType = require('@typescript-eslint/eslint-plugin/dist/configs/recommended-requiring-type-checking');
 const typescriptStrict = require('@typescript-eslint/eslint-plugin/dist/configs/strict');
-// const reactRecommended = require('eslint-plugin-react/configs/recommended');
 const typescriptParser = require('@typescript-eslint/parser');
 
 module.exports = {
   plugins: {
     '@typescript-eslint': typescriptPlugin,
-    // 'react': reactPlugin,
-    // 'react-hooks': reactHooksPlugin,
-    'import': importPlugin,
-    'jsx-a11y': jsxA11yPlugin,
     'prettier': prettierPlugin,
   },
   files: ['**/*.{ts,tsx}'],
-  ignores: ['node_modules', 'lib'],
+  ignores: ['node_modules', 'lib', 'src/playground.ts'],
   languageOptions: {
-    // ...reactRecommended.languageOptions,
     ecmaVersion: 'latest',
     sourceType: 'module',
     parser: typescriptParser,
     parserOptions: { project: tsconfigPath },
   },
-  settings: {
-    'import/extensions': ['.ts', '.tsx', 'd.ts'],
-    'import/ignore': ['node_modules', '\\.(coffee|scss|css|less|hbs|svg|json)$'],
-  },
   rules: {
     ...typescriptRecommended.rules,
     ...typescriptRecommendedType.rules,
     ...typescriptStrict.rules,
-    // ...reactRecommended.rules,
     'prettier/prettier': 'error',
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/consistent-type-assertions': 'error',
-    // '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -132,25 +116,6 @@ module.exports = {
         ObjectExpression: 1,
         ImportDeclaration: 1,
         flatTernaryExpressions: false,
-        // list derived from https://github.com/benjamn/ast-types/blob/HEAD/def/jsx.js
-        ignoredNodes: [
-          'JSXElement',
-          'JSXElement > *',
-          'JSXAttribute',
-          'JSXIdentifier',
-          'JSXNamespacedName',
-          'JSXMemberExpression',
-          'JSXSpreadAttribute',
-          'JSXExpressionContainer',
-          'JSXOpeningElement',
-          'JSXClosingElement',
-          'JSXFragment',
-          'JSXOpeningFragment',
-          'JSXClosingFragment',
-          'JSXText',
-          'JSXEmptyExpression',
-          'JSXSpreadChild',
-        ],
         ignoreComments: false,
       },
     ],
@@ -178,7 +143,6 @@ module.exports = {
         conditionalAssign: true,
         nestedBinaryExpressions: false,
         returnAssign: false,
-        ignoreJSX: 'all', // delegate to eslint-plugin-react
         enforceForArrowConditionals: false,
       },
     ],
@@ -358,58 +322,6 @@ module.exports = {
     'template-curly-spacing': 'error',
     'yield-star-spacing': ['error', 'after'],
 
-    // Import
-    'import/named': 'error',
-    'import/default': 'error',
-    'import/export': 'error',
-    'import/no-named-as-default': 'error',
-    'import/no-named-as-default-member': 'error',
-    'import/no-deprecated': 'error',
-    'import/no-mutable-exports': 'error',
-    'import/no-amd': 'error',
-    'import/first': 'error',
-    'import/no-duplicates': 'error',
-    'import/order': ['error', { groups: [['builtin', 'external', 'internal']] }],
-    'import/newline-after-import': 'error',
-    'import/max-dependencies': ['warn', { max: 40 }],
-    'import/no-absolute-path': 'error',
-    'import/no-dynamic-require': 'error',
-    'import/no-extraneous-dependencies': [
-      'error',
-      {
-        devDependencies: [
-          'test/**', // tape, common npm pattern
-          'tests/**', // also common npm pattern
-          'spec/**', // mocha, rspec-like pattern
-          '**/__tests__/**', // jest pattern
-          '**/__mocks__/**', // jest pattern
-          'test.{js,jsx,ts,tsx}', // repos with a single test file
-          'test-*.{js,jsx,ts,tsx}', // repos with multiple top-level test files
-          '**/*{.,_}{test,spec}.{js,jsx,ts,tsx}', // tests where the extension or filename suffix denotes that it is a test
-          '**/webpack.config.ts', // webpack config
-          '**/webpack.config.*.ts', // webpack config
-          '**/.eslintrc.js', // eslint config
-          '**/.eslintrc.ts', // eslint config
-          '**/*.stories.{ts,tsx,mdx}', // eslint config
-        ],
-        optionalDependencies: false,
-      },
-    ],
-    'import/no-webpack-loader-syntax': 'error',
-    'import/no-unassigned-import': [
-      'error',
-      {
-        allow: ['react-datasheet/lib/react-datasheet.css', '@web/styles/global.css'],
-      },
-    ],
-    'import/no-named-default': 'error',
-    'import/no-self-import': 'error',
-    'import/no-cycle': ['error', { maxDepth: '∞' }],
-    'import/no-useless-path-segments': ['error', { commonjs: true }],
-    // Disabled because of stories and pages files
-    'import/no-unused-modules': 'error',
-    'import/no-relative-packages': 'error',
-
     // Style
     'array-bracket-spacing': ['error', 'never'],
     'block-spacing': ['error', 'always'],
@@ -571,251 +483,6 @@ module.exports = {
     ].concat(confusingBrowserGlobals),
     'no-undef-init': 'error',
 
-    // React A11Y
-    'jsx-a11y/anchor-is-valid': [
-      'error',
-      {
-        components: ['Link'],
-        specialLink: ['to'],
-        aspects: ['noHref', 'invalidHref', 'preferButton'],
-      },
-    ],
-    'jsx-a11y/aria-role': ['error', { ignoreNonDOM: false }],
-    'jsx-a11y/control-has-associated-label': [
-      'error',
-      {
-        labelAttributes: ['label'],
-        controlComponents: [],
-        ignoreElements: ['audio', 'canvas', 'embed', 'input', 'textarea', 'tr', 'video'],
-        ignoreRoles: [
-          'grid',
-          'listbox',
-          'menu',
-          'menubar',
-          'radiogroup',
-          'row',
-          'tablist',
-          'toolbar',
-          'tree',
-          'treegrid',
-        ],
-        depth: 5,
-      },
-    ],
-    'jsx-a11y/label-has-associated-control': [
-      'error',
-      {
-        labelComponents: [],
-        labelAttributes: [],
-        controlComponents: [],
-        assert: 'both',
-        depth: 25,
-      },
-    ],
-    'jsx-a11y/lang': 'error',
-    'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
-
-    // React hooks
-    // 'react-hooks/rules-of-hooks': 'error',
-    // 'react-hooks/exhaustive-deps': 'warn',
-
-    // React
-    // 'no-underscore-dangle': [
-    //   'error',
-    //   {
-    //     allow: ['__typename'],
-    //     allowAfterThis: false,
-    //     allowAfterSuper: false,
-    //     enforceInMethodNames: true,
-    //   },
-    // ],
-    // 'jsx-quotes': ['error', 'prefer-double'],
-    // 'class-methods-use-this': [
-    //   'error',
-    //   {
-    //     exceptMethods: [
-    //       'render',
-    //       'getInitialState',
-    //       'getDefaultProps',
-    //       'getChildContext',
-    //       'componentWillMount',
-    //       'UNSAFE_componentWillMount',
-    //       'componentDidMount',
-    //       'componentWillReceiveProps',
-    //       'UNSAFE_componentWillReceiveProps',
-    //       'shouldComponentUpdate',
-    //       'componentWillUpdate',
-    //       'UNSAFE_componentWillUpdate',
-    //       'componentDidUpdate',
-    //       'componentWillUnmount',
-    //       'componentDidCatch',
-    //       'getSnapshotBeforeUpdate',
-    //     ],
-    //   },
-    // ],
-    // 'react/jsx-boolean-value': ['error', 'never', { always: [] }],
-    // 'react/jsx-closing-bracket-location': ['error', 'line-aligned'],
-    // 'react/jsx-closing-tag-location': 'error',
-    // 'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
-    // 'react/jsx-handler-names': [
-    //   'error',
-    //   { eventHandlerPrefix: 'handle', eventHandlerPropPrefix: 'on' },
-    // ],
-    // 'react/jsx-indent-props': ['error', 2],
-    // 'react/jsx-max-props-per-line': ['error', { maximum: 5, when: 'multiline' }],
-    // 'react/jsx-no-bind': [
-    //   'error',
-    //   {
-    //     ignoreRefs: true,
-    //     allowArrowFunctions: true,
-    //     allowFunctions: false,
-    //     allowBind: false,
-    //     ignoreDOMComponents: true,
-    //   },
-    // ],
-    // 'react/jsx-pascal-case': ['error', { allowAllCaps: true, ignore: [] }],
-    // 'react/jsx-sort-props': [
-    //   'error',
-    //   {
-    //     ignoreCase: true,
-    //     callbacksLast: false,
-    //     shorthandFirst: false,
-    //     shorthandLast: false,
-    //     noSortAlphabetically: false,
-    //     reservedFirst: true,
-    //   },
-    // ],
-    // 'react/no-danger': 'warn',
-    // 'react/no-did-mount-set-state': 'error',
-    // 'react/no-did-update-set-state': 'error',
-    // 'react/no-will-update-set-state': 'error',
-    // 'react/no-multi-comp': ['error', { ignoreStateless: true }],
-    // 'react/prefer-es6-class': ['error', 'always'],
-    // 'react/prefer-stateless-function': ['error', { ignorePureComponents: true }],
-    // 'react/self-closing-comp': 'error',
-    // 'react/sort-comp': [
-    //   'error',
-    //   {
-    //     order: [
-    //       'static-variables',
-    //       'static-methods',
-    //       'instance-variables',
-    //       'lifecycle',
-    //       '/^handle.+$/',
-    //       '/^on.+$/',
-    //       'getters',
-    //       'setters',
-    //       '/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/',
-    //       'instance-methods',
-    //       'everything-else',
-    //       'rendering',
-    //     ],
-    //     groups: {
-    //       lifecycle: [
-    //         'displayName',
-    //         'propTypes',
-    //         'contextTypes',
-    //         'childContextTypes',
-    //         'mixins',
-    //         'statics',
-    //         'defaultProps',
-    //         'constructor',
-    //         'getDefaultProps',
-    //         'getInitialState',
-    //         'state',
-    //         'getChildContext',
-    //         'getDerivedStateFromProps',
-    //         'componentWillMount',
-    //         'UNSAFE_componentWillMount',
-    //         'componentDidMount',
-    //         'componentWillReceiveProps',
-    //         'UNSAFE_componentWillReceiveProps',
-    //         'shouldComponentUpdate',
-    //         'componentWillUpdate',
-    //         'UNSAFE_componentWillUpdate',
-    //         'getSnapshotBeforeUpdate',
-    //         'componentDidUpdate',
-    //         'componentDidCatch',
-    //         'componentWillUnmount',
-    //       ],
-    //       rendering: ['/^render.+$/', 'render'],
-    //     },
-    //   },
-    // ],
-    // 'react/jsx-wrap-multilines': [
-    //   'off',
-    //   {
-    //     declaration: 'parens-new-line',
-    //     assignment: 'parens-new-line',
-    //     return: 'parens-new-line',
-    //     arrow: 'parens-new-line',
-    //     condition: 'parens-new-line',
-    //     logical: 'parens-new-line',
-    //     prop: 'parens-new-line',
-    //   },
-    // ],
-    // 'react/jsx-first-prop-new-line': ['error', 'multiline-multiprop'],
-    // 'react/jsx-equals-spacing': ['error', 'never'],
-    // 'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
-    // 'react/forbid-component-props': ['error', { forbid: ['style'] }],
-    // 'react/no-unused-prop-types': [
-    //   'error',
-    //   {
-    //     customValidators: [],
-    //     skipShapeProps: true,
-    //   },
-    // ],
-    // 'react/style-prop-object': 'error',
-    // 'react/jsx-tag-spacing': [
-    //   'error',
-    //   {
-    //     closingSlash: 'never',
-    //     beforeSelfClosing: 'always',
-    //     afterOpening: 'never',
-    //     beforeClosing: 'never',
-    //   },
-    // ],
-    // 'react/no-array-index-key': 'warn',
-    // 'react/require-default-props': [
-    //   'off',
-    //   {
-    //     forbidDefaultForRequired: true,
-    //   },
-    // ],
-    // 'react/forbid-foreign-prop-types': ['warn', { allowInPropTypes: true }],
-    // 'react/void-dom-elements-no-children': 'error',
-    // 'react/default-props-match-prop-types': ['error', { allowRequiredDefaults: false }],
-    // 'react/no-redundant-should-component-update': 'error',
-    // 'react/no-unused-state': 'error',
-    // 'react/boolean-prop-naming': [
-    //   'warn',
-    //   {
-    //     propTypeNames: ['bool', 'mutuallyExclusiveTrueProps'],
-    //     rule: '^(is|has|should|can)[A-Z]([A-Za-z0-9]?)+',
-    //     message: 'Bool flags must start with either is, has, should or can',
-    //   },
-    // ],
-    // 'react/no-typos': 'error',
-    // 'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'never' }],
-    // 'react/destructuring-assignment': ['error', 'always'],
-    // 'react/no-access-state-in-setstate': 'error',
-    // 'react/button-has-type': ['error', { button: true, submit: true, reset: false }],
-    // 'react/jsx-child-element-spacing': 'error',
-    // 'react/no-this-in-sfc': 'error',
-    // 'react/jsx-max-depth': ['error', { max: 20 }],
-    // 'react/jsx-props-no-multi-spaces': 'error',
-    // 'react/no-unsafe': 'error',
-    // 'react/jsx-fragments': ['error', 'syntax'],
-    // 'react/jsx-curly-newline': ['error', { multiline: 'consistent', singleline: 'consistent' }],
-    // 'react/state-in-constructor': ['error', 'always'],
-    // 'react/static-property-placement': ['error', 'property assignment'],
-    // 'react/jsx-no-script-url': ['error', [{ name: 'Link', props: ['to'] }]],
-    // 'react/jsx-no-useless-fragment': 'error',
-    // 'react/no-adjacent-inline-elements': 'error',
-    // 'react/jsx-newline': ['error', { prevent: true }],
-    // 'react/jsx-no-constructed-context-values': 'error',
-    // 'react/no-unstable-nested-components': 'error',
-
     // Disabled Rules
     '@typescript-eslint/explicit-member-accessibility': 'off',
     'array-bracket-newline': ['off', 'consistent'],
@@ -827,7 +494,6 @@ module.exports = {
     'id-length': 'off',
     'id-match': 'off',
     'implicit-arrow-linebreak': ['off', 'beside'],
-    'jsx-quotes': ['off', 'prefer-double'],
     'init-declarations': 'off',
     'lines-around-comment': 'off',
     'line-comment-position': [
@@ -862,42 +528,6 @@ module.exports = {
     'require-unicode-regexp': 'off',
     'sort-imports': 'off',
     'wrap-regex': 'off',
-
-    // These import rules are either not relevant or covered by the Typescript compiler
-    'import/group-exports': 'off',
-    // Deprecated
-    'import/dynamic-import-chunkname': 'off',
-    'import/exports-last': 'off',
-    'import/imports-first': 'off',
-    'import/namespace': 'off',
-    'import/no-namespace': 'off',
-    'import/no-commonjs': 'off',
-    'import/no-default-export': 'off',
-    'import/no-import-module-exports': ['off', { exceptions: [] }],
-    'import/no-internal-modules': ['off', { allow: [] }],
-    'import/no-named-export': 'off',
-    'import/no-nodejs-modules': 'off',
-    'import/no-relative-parent-imports': 'off',
-    'import/no-restricted-paths': 'off',
-    'import/prefer-default-export': 'off',
-    'import/unambiguous': 'off',
-
-    // These should be considered in the future
-    'jsx-a11y/click-events-have-key-events': 'off',
-    'jsx-a11y/no-onchange': 'off',
-
-    // 'react/display-name': 'off', // Not relevant
-    // 'react/jsx-indent': ['off', 2], // Duplicate rule
-    // 'react/jsx-no-literals': ['off', { noStrings: true }],
-    // 'react/jsx-props-no-spreading': 'off',
-    // 'react/jsx-no-undef': 'off',
-    // 'react/jsx-one-expression-per-line': 'off',
-    // 'react/jsx-sort-default-props': ['off', { ignoreCase: true }], // Duplicated rule
-    // 'react/jsx-sort-prop-types': 'off', // Deprecated in favor of react/jsx-sort-props
-    // 'react/jsx-space-before-closing': ['off', 'always'], // Deprecated
-    // 'react/no-set-state': 'off',
-    // 'react/prefer-read-only-props': 'off',
-    // 'react/require-optimization': ['off', { allowDecorators: [] }], // Not relevant
 
     // Typescript eslint disable
     'brace-style': 'off',
