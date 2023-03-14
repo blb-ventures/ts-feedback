@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/brace-style */
 import { FetchResult } from '@apollo/client';
 import { OperationResult } from 'urql';
-import { FeedbackStrategy } from '../interfaces';
-import {
-  GraphQLStrategy,
-  GraphQLStrategyContext,
-  GraphQLStrategyDefaultMessages,
-  GraphQLStrategyReturn,
-} from './graphql';
+import { DefaultContext, FeedbackStrategy } from '../interfaces';
+import { GraphQLStrategy, GraphQLStrategyDefaultMessages, GraphQLStrategyReturn } from './graphql';
 
 /** The kind of the returned message. */
 export enum OperationMessageKind {
@@ -55,7 +50,7 @@ export interface GraphQLWithOperationInfoStrategyReturn extends GraphQLStrategyR
 }
 
 export class GraphQLWithOperationInfoStrategy
-  implements FeedbackStrategy<GraphQLStrategyContext, GraphQLWithOperationInfoStrategyReturn>
+  implements FeedbackStrategy<GraphQLWithOperationInfoStrategyReturn>
 {
   graphQLStrategy: GraphQLStrategy;
 
@@ -65,7 +60,7 @@ export class GraphQLWithOperationInfoStrategy
 
   successHandler = <ResponseType>(
     response: ResponseType,
-    ctx: GraphQLStrategyContext,
+    ctx: DefaultContext<ResponseType>,
   ): GraphQLWithOperationInfoStrategyReturn => {
     const res = this.graphQLStrategy.successHandler(response, ctx);
     const clientErrors = isDefaultResponse<string>(response)
@@ -82,7 +77,7 @@ export class GraphQLWithOperationInfoStrategy
   errorHandler = <ResponseType>(
     response: ResponseType | null,
     error: unknown,
-    ctx: GraphQLStrategyContext,
+    ctx: DefaultContext<ResponseType>,
   ): GraphQLWithOperationInfoStrategyReturn => {
     const res = this.graphQLStrategy.errorHandler(response, error, ctx);
     const clientErrors = isDefaultResponse<string>(response)
@@ -91,7 +86,7 @@ export class GraphQLWithOperationInfoStrategy
     return { ...res, clientErrors };
   };
 
-  validateResponse = <ResponseType>(response: ResponseType, ctx: GraphQLStrategyContext) => {
+  validateResponse = <ResponseType>(response: ResponseType, ctx: DefaultContext<ResponseType>) => {
     const res = this.graphQLStrategy.validateResponse(response, ctx);
     if (!res) return res;
     const clientErrors = isDefaultResponse<string>(response)
@@ -101,7 +96,10 @@ export class GraphQLWithOperationInfoStrategy
   };
 
   /* eslint-disable-next-line class-methods-use-this */
-  completeHandler = <ResponseType>(response: ResponseType, ctx: GraphQLStrategyContext) => {
+  completeHandler = <ResponseType>(
+    response: ResponseType | null,
+    ctx: DefaultContext<ResponseType>,
+  ) => {
     ctx.onComplete?.(response);
   };
 

@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 
 import { FEEDBACK_KIND } from './constants';
-import { DefaultStrategyReturn, FeedbackReporter, FeedbackStrategy } from './interfaces';
+import { DefaultContext, DefaultReturn, FeedbackReporter, FeedbackStrategy } from './interfaces';
 
 export type FeedbackKind = keyof typeof FEEDBACK_KIND;
 
@@ -23,26 +23,27 @@ const getAwaitedResponse = async <T>(fn: () => T | Promise<T>) => {
   return resOrPromise;
 };
 
-export const createFeedback = <StrategyContext, StrategyReturn extends DefaultStrategyReturn>({
+export const createFeedback = <StrategyReturn extends DefaultReturn>({
   strategy,
   reporter,
 }: {
-  strategy: FeedbackStrategy<StrategyContext, StrategyReturn>;
+  strategy: FeedbackStrategy<StrategyReturn>;
   reporter?: FeedbackReporter;
 }) => {
   return async <FnReturnData>(
     fn: () => FnReturnData | Promise<FnReturnData>,
-    ctx: StrategyContext,
+    ctx: DefaultContext<FnReturnData>,
   ): Promise<FeedbackReturn<FnReturnData> & StrategyReturn> => {
     let response: FnReturnData | null = null;
     let type: FeedbackKind = FEEDBACK_KIND.SUCCESS;
     let strategyReturn: StrategyReturn | null = null;
     try {
-      response = await getAwaitedResponse(fn);
-      if (response == null) throw new Error();
-      const valid = await getAwaitedResponse(() => strategy.validateResponse(response, ctx));
+      const res = await getAwaitedResponse(fn);
+      if (res == null) throw new Error();
+      response = res;
+      const valid = await getAwaitedResponse(() => strategy.validateResponse(res, ctx));
       if (!valid) throw new Error();
-      strategyReturn = await getAwaitedResponse(() => strategy.successHandler(response, ctx));
+      strategyReturn = await getAwaitedResponse(() => strategy.successHandler(res, ctx));
       if (reporter?.success && strategyReturn.successMessage != null) {
         reporter.success(strategyReturn.successMessage);
       }
