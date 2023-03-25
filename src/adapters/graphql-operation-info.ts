@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/brace-style */
-import { FetchResult } from '@apollo/client';
-import { OperationResult } from 'urql';
+import { ExecutionResult } from 'graphql';
 import { DefaultContext, FeedbackStrategy } from '../interfaces';
-import { GraphQLStrategy, GraphQLStrategyDefaultMessages, GraphQLStrategyReturn } from './graphql';
+import {
+  GraphQLStrategy,
+  GraphQLStrategyDefaultMessages,
+  GraphQLStrategyReturn,
+  UrqlLikeResult,
+} from './graphql';
 
 /** The kind of the returned message. */
 export enum OperationMessageKind {
@@ -42,8 +46,8 @@ export type DefaultDataWithOperationInfo<Typename extends string> = Record<
 >;
 
 export type DefaultResponseWithOperationInfo<Typename extends string = string> =
-  | OperationResult<DefaultDataWithOperationInfo<Typename>>
-  | FetchResult<DefaultDataWithOperationInfo<Typename>>;
+  | ExecutionResult<DefaultDataWithOperationInfo<Typename>>
+  | UrqlLikeResult<DefaultDataWithOperationInfo<Typename>>;
 
 export interface GraphQLWithOperationInfoStrategyReturn extends GraphQLStrategyReturn {
   clientErrors?: string[];

@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/brace-style */
-import { ApolloError, FetchResult } from '@apollo/client';
-import { GraphQLError } from 'graphql';
-import { CombinedError, OperationResult } from 'urql';
+import { ExecutionResult, GraphQLError } from 'graphql';
 import { DefaultContext, DefaultReturn, FeedbackStrategy } from '../interfaces';
 
+export interface GraphqlClientError extends Error {
+  message: string;
+  graphQLErrors?: GraphQLError[];
+  networkError?: Error;
+}
+
+export interface UrqlLikeResult<TData = Record<string, any>> {
+  data?: TData | null;
+  error?: GraphqlClientError | null;
+}
+
 export type DefaultData = Record<string, any>;
-export type DefaultResponse = OperationResult<DefaultData> | FetchResult<DefaultData>;
+export type DefaultResponse = ExecutionResult<DefaultData> | UrqlLikeResult<DefaultData>;
 
 export interface GraphQLStrategyReturn extends DefaultReturn {
   hasErrors: boolean;
@@ -48,18 +57,12 @@ export class GraphQLStrategy implements FeedbackStrategy<GraphQLStrategyReturn> 
     ctx: DefaultContext<ResponseType>,
   ): GraphQLStrategyReturn => {
     ctx.onError?.(error);
-    const serverErrors = isUrqlResponse(response) ? this.getErrorServerErrors(response.error) : [];
-    if (error instanceof ApolloError) {
-      serverErrors.push(...this.getErrorServerErrors(error));
-    }
-    if (error instanceof CombinedError) {
-      serverErrors.push(...this.getErrorServerErrors(error));
-    }
+    const serverErrors = isUrqlLikeResponse(response)
+      ? this.getErrorServerErrors(response.error)
+      : [];
+    if (isGraphQLClientError(error)) serverErrors.push(...this.getErrorServerErrors(error));
     let errorMessage = ctx.errorMessage ?? this.errorMessages.defaultMessage;
-    if (
-      (error instanceof CombinedError || error instanceof ApolloError) &&
-      error.networkError != null
-    ) {
+    if (isGraphQLClientError(error) && error.networkError != null) {
       errorMessage = this.errorMessages.networkError;
     }
     return { serverErrors, errorMessage, hasErrors: true };
@@ -83,19 +86,20 @@ export class GraphQLStrategy implements FeedbackStrategy<GraphQLStrategyReturn> 
   };
 
   /* eslint-disable-next-line class-methods-use-this */
-  getErrorServerErrors(error: ApolloError | CombinedError | null | undefined) {
-    if (error != null) {
-      if (error.graphQLErrors.length > 0) {
-        return (error.graphQLErrors as GraphQLError[]).map(it => it.message);
-      }
-      return [error.message];
+  getErrorServerErrors(error: GraphqlClientError | null | undefined): string[] {
+    if (error == null) return [];
+    if ((error.graphQLErrors ?? []).length > 0) {
+      return (error.graphQLErrors as GraphQLError[]).map(it => it.message);
     }
-    return [] as string[];
+    return [error.message];
   }
 }
 
 const isDefaultResponse = (value: unknown): value is DefaultResponse =>
   value != null && typeof value === 'object' && 'data' in value;
 
-const isUrqlResponse = (value: unknown): value is OperationResult<DefaultData> =>
+const isUrqlLikeResponse = (value: unknown): value is UrqlLikeResult<DefaultData> =>
   isDefaultResponse(value) && 'error' in value;
+
+const isGraphQLClientError = (error: unknown): error is GraphqlClientError =>
+  error instanceof Error && 'graphQLErrors' in error;
