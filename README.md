@@ -90,5 +90,5 @@ It expects the spec response for `ExecutionResult` and can deal with server erro
 ### GraphQL with OperationInfo
 
 Same as the GraphQL adapter, but it also detects a response error when the return format contains a `OperationInfo` type object.
-This format is defined throughout most of BLB Ventures projects and it is a object that is returned instead of the desired response object.
-This kind of response only occurs when there is some kind mal formed input or other validation errors when requesting a Mutation.
+This format is defined throughout most of BLB Ventures projects and it is a object that is returned instead of the desired response object (We usually declare Mutation responses as a Union of the desired object and the `OperationInfo` error response).
+This kind of response only occurs when there is some kind malformed input or other validation errors when requesting a Mutation.
