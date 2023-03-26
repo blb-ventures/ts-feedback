@@ -39,7 +39,6 @@ export const createFeedback = <StrategyReturn extends DefaultReturn>({
     let strategyReturn: StrategyReturn | null = null;
     try {
       const res = await getAwaitedResponse(fn);
-      if (res == null) throw new Error();
       response = res;
       const valid = await getAwaitedResponse(() => strategy.validateResponse(res, ctx));
       if (!valid) throw new Error();

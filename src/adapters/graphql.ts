@@ -88,7 +88,7 @@ export class GraphQLStrategy implements FeedbackStrategy<GraphQLStrategyReturn> 
   /* eslint-disable-next-line class-methods-use-this */
   getErrorServerErrors(error: GraphqlClientError | null | undefined): string[] {
     if (error == null) return [];
-    if ((error.graphQLErrors ?? []).length > 0) {
+    if (error.graphQLErrors != null && error.graphQLErrors.length > 0) {
       return (error.graphQLErrors as GraphQLError[]).map(it => it.message);
     }
     return [error.message];

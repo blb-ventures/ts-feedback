@@ -85,7 +85,7 @@ export class GraphQLWithOperationInfoStrategy
   ): GraphQLWithOperationInfoStrategyReturn => {
     const res = this.graphQLStrategy.errorHandler(response, error, ctx);
     const clientErrors = isDefaultResponse<string>(response)
-      ? this.getResponseInputErrors(response?.data)
+      ? this.getResponseInputErrors(response.data)
       : [];
     return { ...res, clientErrors };
   };
