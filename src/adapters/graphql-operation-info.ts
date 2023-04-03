@@ -96,7 +96,7 @@ export class GraphQLWithOperationInfoStrategy
     const clientErrors = isDefaultResponse<string>(response)
       ? this.getResponseInputErrors(response.data)
       : [];
-    return clientErrors.length > 0;
+    return clientErrors.length <= 0;
   };
 
   /* eslint-disable-next-line class-methods-use-this */
