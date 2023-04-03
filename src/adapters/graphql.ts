@@ -80,7 +80,7 @@ export class GraphQLStrategy implements FeedbackStrategy<GraphQLStrategyReturn> 
   validateResponse = <ResponseType>(response: ResponseType, ctx: DefaultContext<ResponseType>) => {
     if (ctx.successCondition != null) return ctx.successCondition(response);
     if (isDefaultResponse(response)) {
-      return response.data != null && (!('error' in response) || response.error != null);
+      return response.data != null && (!('error' in response) || response.error == null);
     }
     return false;
   };

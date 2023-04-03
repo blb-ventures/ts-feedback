@@ -10,11 +10,14 @@ export const graphqlFeedback = createFeedback({
 });
 
 const example = async () => {
-  const res = await graphqlFeedback(async () => ({ data: { test: { id: '1' } } }), {
-    successMessage: 'Success',
-    onSuccess: res => res.data.test.id,
-  });
-  console.log(res.response?.data.test.id);
+  const res = await graphqlFeedback(
+    async () => ({ data: { test: { id: '1' } }, error: undefined }),
+    {
+      successMessage: 'Success',
+      onSuccess: res => res.data.test.id,
+    },
+  );
+  console.log(res);
 };
 
 example();
